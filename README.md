@@ -1,6 +1,6 @@
 # IoT Project-Team D Part
 
-| Hamza Harti | | | | |
+| Hamza Harti | Etienne Imsirovic | Lisa Tawackoli | Vladislav Neufeld |
 
 ##  1. Architecture
 
@@ -34,6 +34,6 @@ Ansible/                   <!--Main Directory-->
 # Run Ansible Playbook
 ansible-playbook -i hosts.cfg ansible.yml --private-key key/hamza_key.pm
 ```
-| ![Ansible_Part1.png](img/Ansible_Part1.png.png)![Ansible_Part2.png](img/Ansible_Part2.png.png) |
+| ![Ansible_Part1.png](img/Ansible_Part1.png)![Ansible_Part2.png](img/Ansible_Part2.png) |
 |:--:| 
 | *Ansible Output Terminal* |
