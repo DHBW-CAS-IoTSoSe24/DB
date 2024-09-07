@@ -1,0 +1,151 @@
+- hosts: all
+  name: Configure Virtual Machine
+  gather_facts: yes
+  become: yes  # Run tasks with sudo
+  become_user: root
+
+  tasks:
+
+    - name: Establish Connection To VM
+      block:
+
+        # Wait to establish Connection
+        - name: Awaiting SSH
+          wait_for_connection:
+
+        - name: Wait for cloud-init to finish
+          raw: while [ ! -f /var/lib/cloud/instance/boot-finished ]; do sleep 10s; done
+          retries: 10
+          delay: 1
+
+        # Gather package facts to check if packages are already installed
+        - name: Gather installed packages information
+          package_facts:
+
+        # Install required packages
+        - name: Installing required system packages
+          apt:
+            name:
+              - git
+              - apt-transport-https
+              - curl
+              - ca-certificates
+              - software-properties-common
+              - python3
+              - python3-pip
+              - virtualenv
+              - wget
+            state: latest
+            update_cache: yes
+
+    - name: Install and Configure Docker
+      block:
+
+        # Install and Configure Docker if it's not installed
+        - name: Check if Docker is installed
+          command: docker --version
+          register: docker_check
+          ignore_errors: yes
+
+        - name: Install Docker 1/4 [Add Docker GPG apt Key] if Docker is not installed
+          apt_key:
+            url: https://download.docker.com/linux/ubuntu/gpg
+            state: present
+          when: docker_check.rc != 0
+        
+        # Add Docker Repository if Docker is not installed
+        - name: Add Docker Repository if Docker is not installed
+          apt_repository:
+            repo: deb https://download.docker.com/linux/ubuntu focal stable
+            state: present
+          when: docker_check.rc != 0
+        
+        # Install Docker Community Edition if Docker is not installed
+        - name: Install Docker 2/4 [Update apt and install docker-ce] if Docker is not installed
+          apt:
+            name: docker-ce
+            state: latest
+            update_cache: true
+          when: docker_check.rc != 0
+
+        # Add Current User to use Docker without Root
+        - name: Install Docker 3/4 [Add current user to the docker group]
+          user:
+            name: "{{ ansible_user }}"
+            groups: docker
+            append: yes
+
+        # Ensure User has Access to Docker Socket
+        - name: Install Docker 4/4 [Ensure user has access to Docker socket]
+          file:
+            path: /var/run/docker.sock
+            owner: "{{ ansible_user }}"
+            group: "{{ ansible_user }}"
+
+    - name: Prepare Docker Tools and Environment
+      block:
+
+        # Install Docker Libraries for Python if not installed
+        - name: Check if Docker Python SDK is installed
+          pip:
+            name: docker
+            state: present
+
+        # Enable Docker if it's not started
+        - name: Ensure Docker is started and enabled
+          systemd:
+            name: docker
+            state: started
+            enabled: yes
+
+        # Download Docker Compose if not already downloaded
+        - name: Check if Docker Compose is present
+          stat:
+            path: /usr/bin/docker-compose
+          register: compose_check
+
+        - name: Download Docker-Compose
+          shell: curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/bin/docker-compose
+          when: compose_check.stat.exists == false
+
+        # Give Docker Compose the right permissions
+        - name: Make Docker-Compose Executable
+          file:
+            path: /usr/bin/docker-compose
+            mode: '0755'
+            state: file
+
+    - name: Prepare and Run The Docker Containers
+      block:
+
+        # Prepare a Directory for Docker Compose
+        - name: Create directory for Docker Compose files
+          file:
+            path: /opt/docker
+            state: directory
+            mode: '0755'
+
+        # Prepare a Directory for The Prometheus Config File
+        - name: Create directory for Prometheus Config file
+          file:
+            path: /opt/docker/prometheus
+            state: directory
+            mode: '0755'
+
+        # Retrieve the Docker Compose File
+        - name: Copy Docker Compose file
+          copy:
+            src: /cygdrive/c/Users/hamza/OneDrive/Bureau/Ansible/docker_compose/docker-compose.yaml
+            dest: /opt/docker/docker-compose.yaml
+
+        # Retrieve The Prometheus Config File
+        - name: Copy Prometheus configuration file
+          template:
+            src: /cygdrive/c/Users/hamza/OneDrive/Bureau/Ansible/docker_compose/prometheus.yaml
+            dest: /opt/docker/prometheus.yaml
+
+        # Start The Containers for Grafana, Prometheus, and The Application
+        - name: Start Docker Compose
+          command: docker-compose up -d
+          args:
+            chdir: /opt/docker

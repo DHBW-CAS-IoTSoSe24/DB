@@ -1,0 +1,31 @@
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yml
+      - prom_data:/prometheus
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+
+  influxdb:
+    image: influxdb:latest
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+    restart: unless-stopped
+    environment:
+      - INFLUXDB_DB=IoT
+      - INFLUXDB_ADMIN_USER=influx_adm
+      - INFLUXDB_ADMIN_PASSWORD=influx_adm
+      - INFLUXDB_USER=influx_usr
+      - INFLUXDB_USER_PASSWORD=influx_usr
+    volumes:
+      - influxdb-data:/var/lib/influxdb
+
+volumes:
+  influxdb-data: {}
+  prom_data: {}
