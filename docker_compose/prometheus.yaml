@@ -1,21 +1,38 @@
 global:
+  # Set the default interval at which Prometheus scrapes metrics from targets
   scrape_interval: 5s
+  # Set the default timeout for scraping a target; if it takes longer, the scrape fails
   scrape_timeout: 1s
+  # Set the interval at which Prometheus evaluates rules (for alerting and recording)
   evaluation_interval: 15s
+
 alerting:
   alertmanagers:
+    # Configure the Alertmanager instances for Prometheus to send alerts to
     - static_configs:
+      # List of alertmanager instances (currently empty, can be filled with targets)
       - targets: []
+      # Define the protocol used for communication (HTTP in this case)
       scheme: http
+      # Timeout for sending alerts to Alertmanager
       timeout: 1s
+      # API version of Alertmanager being used
       api_version: v1
+
 scrape_configs:
+  # Define a scrape job for collecting metrics from Node-RED
   - job_name: nodeRed_job
+    # Respect timestamps included with metrics to keep them accurate
     honor_timestamps: true
+    # Set the scrape interval for this specific job (can override the global setting)
     scrape_interval: 5s
+    # Set the timeout for this specific scrape job (can override the global setting)
     scrape_timeout: 1s
+    # Define the path where the metrics are exposed on the target
     metrics_path: /metrics/
+    # Define the protocol used to scrape the metrics (HTTP in this case)
     scheme: http
     static_configs:
+      # List of targets to scrape (in this case, a specific Node-RED instance at IP 141.72.13.25 on port 1880)
       - targets:
         - 141.72.13.25:1880

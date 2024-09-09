@@ -1,28 +1,44 @@
 services:
+  # Define a service for Prometheus
   prometheus:
+    # Define the image to be used by Docker
     image: prom/prometheus:latest
+    # Set the name of the container
     container_name: prometheus
+    # Define volumes for Prometheus container
     volumes:
+      # Mount the Prometheus configuration file from the host system into the specified directory inside the container
       - ./prometheus.yaml:/etc/prometheus/prometheus.yml
+      # Define where Prometheus data is to be stored
       - prom_data:/prometheus
     ports:
+      # Port where the Prometheus instance is accessible
       - "9090:9090"
+    # Restart the container in all cases, except when the container is stopped manually
     restart: unless-stopped
+    # Define the location of the Prometheus configuration file inside the container
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
-
+  
+  # Define a service for InfluxDB
   influxdb:
+    # Define the image to be used by Docker
     image: influxdb:latest
+    # Set the name of the container
     container_name: influxdb
+    # Ports where the InfluxDB instance is accessible
     ports:
       - "8086:8086"
+    # Restart the container in all cases, except when the container is stopped manually
     restart: unless-stopped
+    # Define environment variables for InfluxDB
     environment:
       - INFLUXDB_DB=IoT
       - INFLUXDB_ADMIN_USER=influx_adm
       - INFLUXDB_ADMIN_PASSWORD=influx_adm
       - INFLUXDB_USER=influx_usr
       - INFLUXDB_USER_PASSWORD=influx_usr
+    # Define where InfluxDB data is to be stored
     volumes:
       - influxdb-data:/var/lib/influxdb
 
