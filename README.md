@@ -16,9 +16,18 @@ Ansible/                   <!--Main Directory-->
 ┃ ┣ docker-compose.yaml    <!--Configuration file for Docker-compose-->
 ┃ ┗ prometheus.yaml        <!--Prometheus Configuration file-->
 ┣ img/                     <!--Media for Documentation-->
+┃ ┣ Ansible-Blocks.png
+┃ ┣ Ansible_First_Block.png
+┃ ┣ Ansible_Fourth_Block.png
 ┃ ┣ Ansible_Part1.png
 ┃ ┣ Ansible_Part2.png
-┃ ┗ Architecture-TeamD.svg
+┃ ┣ Ansible_Second_Block.png
+┃ ┣ Ansible_Third_Block.png
+┃ ┣ Architecture-TeamD.svg
+┃ ┣ InfluxDB_Docker_Compose.png
+┃ ┣ Prometheus_Config_File.png
+┃ ┣ Prometheus_Docker_Compose.png
+┃ ┗ Prometheus_UI.png
 ┣ key/                     <!--SSH Key Directory-->
 ┃ ┗ hamza_key              <!--SSH Private Key-->
 ┣ ansible.cfg              <!--Ansible Configuration file-->
