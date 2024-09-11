@@ -10,7 +10,7 @@ A key component of the setup is Ansible, managed from a personal laptop via an S
 
 | ![Architecture-TeamD.svg](img/Architecture-TeamD.svg) | 
 |:--:| 
-| *Architecture Team D Overview* |
+| *Architecture Overview* |
 
 ##  2. Project Structure
 
