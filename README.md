@@ -52,7 +52,7 @@ Starting from a local linux machine, and having ansible installed, you can run t
 cd ansible
 
 # Run Ansible Playbook
-ansible-playbook -i hosts.cfg ansible.yml --private-key key/hamza_key.pm
+ansible-playbook -i hosts.cfg ansible.yaml --private-key key/hamza_key.pm
 ```
 The playbook is divided into 4 Blocks, each block has a set of tasks.
 
